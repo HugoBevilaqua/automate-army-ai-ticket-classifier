@@ -1,0 +1,30 @@
+# --- Security ---
+.env
+
+# --- Environment & Dependencies ---
+venv/
+
+# --- Python System Files ---
+__pycache__/
+*.pyc
+
+# --- Editor Specific ---
+.vscode/
+
+# --- Operating System ---
+Thumbs.db
+.DS_Store
+
+# --- Data Management ---
+data/*
+
+!data/tickets-10.csv
+!data/tickets-100.csv
+!data/tickets-10-no-header.csv
+!data/tickets-10-unusual.csv
+!data/tickets-100-kaggle-1.csv
+!data/tickets-100-kaggle-2.csv
+!data/tickets-10-gibberish.csv
+
+data/enriched_tickets.csv
+data/statistics.csv

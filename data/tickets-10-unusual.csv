@@ -1,0 +1,11 @@
+Customer_Note,Timestamp,Log_ID,Origin_Region,Urgency_Code
+"My package has been stuck in 'Customs' for 4 days. Can you check if there's a paperwork issue?","2026-01-14 09:15",LOG-8821,"North America",P3
+"URGENT: The API for shipping labels is returning a 500 error. Our warehouse cannot print any labels!","2026-01-14 09:20",LOG-8822,"Global",P1
+"I was charged a 'Fuel Surcharge' twice on my last invoice. I need a credit for the overcharge.","2026-01-14 10:05",LOG-8823,"Europe",P2
+"Do you offer refrigerated shipping for perishable food items? Looking for a quote for next month.","2026-01-14 11:30",LOG-8824,"South America",P4
+"The driver left the pallet on the sidewalk instead of the loading dock. It's blocking traffic.","2026-01-14 12:45",LOG-8825,"Asia",P2
+"I can't log into my corporate dashboard. It says 'Account Suspended' but our bill is paid.","2026-01-14 13:10",LOG-8826,"North America",P1
+"The tracking link in the email leads to a 404 page. The customer is asking for an update.","2026-01-14 14:00",LOG-8827,"Europe",P3
+"We received 48 boxes but the manifest says 50. Two boxes of electronic components are missing.","2026-01-14 15:22",LOG-8828,"North America",P2
+"Is it possible to change my delivery address to a PO Box?","2026-01-14 16:45",LOG-8829,"Oceania",P4
+"SAFETY HAZARD: One of the chemical drums in the shipment is leaking a clear fluid. Please advise.","2026-01-14 17:05",LOG-8830,"North America",P1
