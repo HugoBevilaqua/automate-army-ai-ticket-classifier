@@ -26,7 +26,6 @@ The tool is divided into four distinct stages:
 
 ## Setup and Installation
 
-### 1. Environment Configuration
 Clone the repository and install dependencies:
 
 `pip install -r requirements.txt`
@@ -35,10 +34,7 @@ Create a `.env` file in the root directory:
 
 `PROJECT_API_KEY=your_gemini_api_key`
 
-### 2. Configuration
-Modify `config.py` to define custom parameters:
-
-## 3. Usage
+## Usage
 
 ### Generating Test Data (Optional)
 To generate a sample CSV for testing without using real customer data:
@@ -54,7 +50,7 @@ When prompted for a file path, you can:
 1.  **Press Enter:** Automatically loads the default file (configurable in settings) `data/tickets-10.csv`.
 2.  **Type a path:** Try one of the edge-case files, such as `data/tickets-10-unusual.csv`, to see the intelligent intake in action.
 
-## 4 Showcase & Test Datasets
+## Showcase & Test Datasets
 
 The `/data` folder includes curated datasets to demonstrate the system's flexibility:
 
