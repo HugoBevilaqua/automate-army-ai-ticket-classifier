@@ -5,7 +5,7 @@ import pandas as pd
 from google import genai
 from dotenv import load_dotenv
 from tenacity import retry, stop_after_attempt, wait_fixed
-from config import TICKET_CREATOR_COLUMNS, MODEL_NAME, TEST_FILE
+from config import TICKET_CREATOR_COLUMNS, MODEL_NAME, TEST_FILE, OUTPUT_DIR
 
 # Utility script to generate synthetic support tickets for testing and demo purposes.
 def generate_test_data(client):
@@ -25,8 +25,15 @@ def generate_test_data(client):
         
         break
 
-    file_name = input("Enter filename, or leave blank for default: ").strip() or TEST_FILE
-    if not file_name.endswith(".csv"): file_name += ".csv"
+    filename = input("Enter filename, or leave blank for default: ").strip()
+    if not filename:
+        full_path = TEST_FILE  # Use the default from config.py
+    else:
+        # Sanitize the custom name
+        filename = os.path.basename(filename)
+        if not filename.endswith(".csv"): 
+            filename += ".csv"
+        full_path = os.path.join(OUTPUT_DIR, filename)
 
     # 2. Structured output schema (JSON enforcement)
     # We define an array-based JSON schema to ensure the AI returns a structured 
@@ -77,9 +84,11 @@ def generate_test_data(client):
     # 5. Export
     # We use QUOTE_ALL to ensure that even if a generated ticket contains 
     # commas or special characters, the CSV structure remains intact.
+    os.makedirs(os.path.dirname(full_path), exist_ok=True)
     df = pd.DataFrame(ticket_list)[TICKET_CREATOR_COLUMNS]
-    df.to_csv(file_name, index=False, quoting=csv.QUOTE_ALL, quotechar='"')
-    print(f"--- DONE! Check '{file_name}' ---")
+    df.to_csv(full_path, index=False, quoting=csv.QUOTE_ALL, quotechar='"')
+    print(f"--- DONE! Check '{full_path}' ---")
+    input("Press Enter to close...")
 
 # Standalone execution block for testing/debugging
 if __name__ == "__main__":
