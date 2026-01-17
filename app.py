@@ -1,5 +1,6 @@
 import os
 import io
+import csv
 import pandas as pd
 import streamlit as st
 import plotly.express as px
@@ -123,7 +124,7 @@ def display_dashboard():
     col1, col2, colspacer = st.columns([2, 2, 10])
     with col1:
         try:
-            csv_data = df.to_csv(index=False)
+            csv_data = df.to_csv(index=False, quoting=csv.QUOTE_NONNUMERIC)
             st.download_button(
                 label="📥 Download Enriched Tickets",
                 data=csv_data,
