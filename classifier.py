@@ -8,45 +8,46 @@ from google.genai import errors
 from google.genai import types
 from dotenv import load_dotenv
 from tenacity import retry, wait_exponential, stop_after_attempt
-from config import MASTER_CATEGORIES, MASTER_PRIORITIES, MASTER_COLUMNS, MASTER_COLUMNS_FALLBACK, MODEL_NAME, OUTPUT_FILE, INPUT_FILE, CLASSIFICATION_SCHEMA
+from config import MASTER_COLUMNS, MASTER_COLUMNS_FALLBACK, MODEL_NAME, OUTPUT_FILE, INPUT_FILE, CLASSIFICATION_SCHEMA
 
-def run_classification(df, client, target_col):
+# 1. Observability (Logging)
+# We define a custom logger to provide clear terminal feedback during retries.
+# This distinguishes between 'Server Overload' and 'Rate Limits', helping
+# the user understand the cause of a failed attempt.
+def log_retry(retry_state):
+    # retry_state.outcome.exception() gives us the actual error object
+    err = retry_state.outcome.exception()        
+    # We simplify the message for the terminal
+    if isinstance(err, errors.ServerError):
+        msg = "Server busy (503 Overloaded)"
+    elif "429" in str(err):
+        msg = "Rate limit reached (429)"
+    else:
+        msg = str(err).split('.')[0] # Get just the first part of the error            
+    print(f"  Attempt {retry_state.attempt_number} failed: {msg}. Retrying...")
 
-    # 1. Observability (Logging)
-    # We define a custom logger to provide clear terminal feedback during retries.
-    # This distinguishes between 'Server Overload' and 'Rate Limits', helping
-    # the user understand the cause of a failed attempt.
-    def log_retry(retry_state):
-        # retry_state.outcome.exception() gives us the actual error object
-        err = retry_state.outcome.exception()        
-        # We simplify the message for the terminal
-        if isinstance(err, errors.ServerError):
-            msg = "Server busy (503 Overloaded)"
-        elif "429" in str(err):
-            msg = "Rate limit reached (429)"
-        else:
-            msg = str(err).split('.')[0] # Get just the first part of the error            
-        print(f"  Attempt {retry_state.attempt_number} failed: {msg}. Retrying...")
-
-    # 2. Resilience logic (Exponential backoff)
-    # Cloud APIs can be unstable. We use wait_exponential to increase the wait time between retries, 
-    # giving the server time to recover while preventing our script from crashing.
-    @retry(
-        wait=wait_exponential(multiplier=2, min=2, max=30), 
-        stop=stop_after_attempt(10),
-        after=log_retry, # This tells Tenacity to run our log function
-        reraise=True
-    )
-    def classify_ticket(description):
-        response = client.models.generate_content(
-            model=MODEL_NAME,
-            contents=f"Classify this support ticket: '{description}'",
-            config=types.GenerateContentConfig(
-                response_mime_type='application/json',
-                response_schema=CLASSIFICATION_SCHEMA
-            )
+# 2. Resilience logic (Exponential backoff)
+# Cloud APIs can be unstable. We use wait_exponential to increase the wait time between retries, 
+# giving the server time to recover while preventing our script from crashing.
+@retry(
+    wait=wait_exponential(multiplier=2, min=2, max=30), 
+    stop=stop_after_attempt(10),
+    after=log_retry, # This tells Tenacity to run our log function
+    reraise=True
+)
+def classify_ticket(client, description):
+    response = client.models.generate_content(
+        model=MODEL_NAME,
+        contents=f"Classify this support ticket: '{description}'",
+        config=types.GenerateContentConfig(
+            response_mime_type='application/json',
+            response_schema=CLASSIFICATION_SCHEMA
         )
-        return json.loads(response.text)
+    )
+    return json.loads(response.text)
+
+# Main classification workflow to enrich the DataFrame with AI-generated labels
+def run_classification(df, client, target_col, progress_callback=None):
 
     # 3. Iterative processing
     total_tickets = len(df)
@@ -59,7 +60,10 @@ def run_classification(df, client, target_col):
         try:
             # Get our classifications for each row
             print(f"[{i}/{total_tickets}] Processing ticket...")
-            result = classify_ticket(row[target_col])
+            if progress_callback:
+                progress_callback(i, total_tickets, "processing")
+            
+            result = classify_ticket(client, row[target_col])
             for idx, col in enumerate(MASTER_COLUMNS):
                 # We use .get() with a fallback to ensure the script continues 
                 # even if one JSON field is missing.
@@ -84,7 +88,7 @@ def run_classification(df, client, target_col):
             # Keep counting up until a name is available
             while legacy_name in df.columns:
                 legacy_name = f"{col}_original_{counter}"
-                counter += 1            
+                counter += 1
             print(f"Column '{col}' already exists. Renaming existing data to '{legacy_name}'...")
             df.rename(columns={col: legacy_name}, inplace=True)
     
@@ -92,6 +96,10 @@ def run_classification(df, client, target_col):
         df[col] = result_dict[col]
 
     df.to_csv(OUTPUT_FILE, index=False, quoting=csv.QUOTE_NONNUMERIC)
+    
+    if progress_callback:
+        progress_callback(total_tickets, total_tickets, "complete")
+    
     print(f"--- DONE! Check '{OUTPUT_FILE}' ---")
 
 # Standalone execution block for testing/debugging

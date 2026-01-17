@@ -9,7 +9,9 @@ The tool is divided into four distinct stages:
 1. **Intake (`csv_handler.py`):** Loads CSV files, uses LLM reasoning to identify if a header row exists, and prompts the user to confirm which column contains the ticket descriptions.
 2. **Classification (`classifier.py`):** Forwards ticket contents to Gemini. It uses JSON schemas to enforce specific categories and priority levels defined in `config.py`.
 3. **Analysis (`analyst.py`):** Processes the output data to calculate success rates, average certainty scores, and volume distribution.
-4. **Visualization (`dashboard.py`):** A Streamlit interface that reads the generated statistics and displays them via charts and data tables.
+4. **Visualization:** Two interfaces available:
+   - **Web UI (`app.py`):** A Streamlit-based interactive web interface for guided file upload, header/column confirmation, real-time classification progress, and dashboard visualization.
+   - **Terminal UI (`main.py` with `dashboard.py`):** A command-line interface that runs the full pipeline and launches a dashboard at completion.
 
 ## Key Technical Features and Decisions
 
@@ -19,7 +21,7 @@ The tool is divided into four distinct stages:
 * **Automated Quality Triage:** Implements a Confidence Thresholding system that automatically flags low-certainty AI classifications for manual human review.
 * **JSON Schema Enforcement:** Guarantees AI responses follow a machine-readable format.
 * **Resilience via Tenacity:** To handle the inherent instability of cloud APIs, the system implements exponential backoff. This allows the tool to survive "429 Rate Limit" and "503 Server Overloaded" errors by intelligently waiting and retrying rather than crashing the pipeline.
-* **Decoupled Analytics Pipeline:** We separate the data aggregation (`analyst.py`) from the visualization layer (`dashboard.py`). This "Process-then-Display" pattern ensures the dashboard loads instantly for the end-user by reading pre-calculated statistics rather than re-processing raw data on every refresh.
+* **Decoupled Analytics Pipeline:** We separate the data aggregation (`analyst.py`) from the visualization layer. This "Process-then-Display" pattern ensures the dashboard loads instantly for the end-user by reading pre-calculated statistics rather than re-processing raw data on every refresh.
 * **Data Integrity:** If classification columns already exist, the tool renames original columns to `{name}_original` to prevent data loss.
 * **Config-Driven Architecture (SSOT):** The `config.py` file acts as the "Single Source of Truth."
 * **Synthetic Data Generation:** Includes `create_tickets.py` to generate test datasets for development.
@@ -41,14 +43,34 @@ To generate a sample CSV for testing without using real customer data:
 
 `python create_tickets.py`
 
-### Running the tool
-To run the end-to-end workflow (Intake, Classify, Analyze, and Launch Dashboard):
+### Running the Tool
+
+#### Web UI (Recommended for Interactive Use)
+Launch the Streamlit web interface with a guided workflow:
+
+**Option 1 - From Terminal:**
+`streamlit run app.py`
+
+**Option 2 - Double-click the batch file:**
+`run_app.bat`
+
+This opens an interactive web dashboard where you can:
+1. **Upload** a CSV file via drag-and-drop
+2. **Confirm** header detection with a single click
+3. **Select** the ticket description column from available options
+4. **Monitor** classification progress in real-time with a progress bar
+5. **Explore** results through an interactive dashboard with filters, charts, and download options
+
+#### Terminal Interface (For Batch Processing)
+To run the end-to-end workflow from the command line:
 
 `python main.py`
 
 When prompted for a file path, you can:
-1.  **Press Enter:** Automatically loads the default file (configurable in settings) `data/tickets-10.csv`.
-2.  **Type a path:** Try one of the edge-case files, such as `data/tickets-10-unusual.csv`, to see the intelligent intake in action.
+1. **Press Enter:** Automatically loads the default file (configurable in settings) `data/tickets-10.csv`.
+2. **Type a path:** Try one of the edge-case files, such as `data/tickets-10-unusual.csv`, to see the intelligent intake in action.
+
+The terminal interface will complete classification and then automatically launch the dashboard.
 
 ## Showcase & Test Datasets
 
