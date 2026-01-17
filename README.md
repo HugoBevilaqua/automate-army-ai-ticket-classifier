@@ -43,9 +43,9 @@ To generate a sample CSV for testing without using real customer data:
 
 `python create_tickets.py`
 
-## Running the Tool
+### Running the Tool
 
-### Web UI (Recommended for Interactive Use)
+#### Web UI (Recommended for Interactive Use)
 Launch the Streamlit web interface with a guided workflow:
 
 **Option 1 - From Terminal:**
@@ -61,7 +61,7 @@ This opens an interactive web dashboard where you can:
 4. **Monitor** classification progress in real-time with a progress bar
 5. **Explore** results through an interactive dashboard with filters, charts, and download options
 
-### Terminal Interface (For Batch Processing)
+#### Terminal Interface (For Batch Processing)
 To run the end-to-end workflow from the command line:
 
 `python main.py`
