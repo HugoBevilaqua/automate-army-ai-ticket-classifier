@@ -8,7 +8,7 @@ from google.genai import errors
 from google.genai import types
 from dotenv import load_dotenv
 from tenacity import retry, wait_exponential, stop_after_attempt
-from config import MASTER_COLUMNS, MASTER_COLUMNS_FALLBACK, MODEL_NAME, OUTPUT_FILE, INPUT_FILE, CLASSIFICATION_SCHEMA
+from config import MASTER_COLUMNS, MASTER_COLUMNS_FALLBACK, MODEL_NAME, OUTPUT_FILE, INPUT_FILE, CLASSIFICATION_SCHEMA, WAIT_TIME
 
 # 1. Observability (Logging)
 # We define a custom logger to provide clear terminal feedback during retries.
@@ -69,8 +69,8 @@ def run_classification(df, client, target_col, progress_callback=None):
                 # even if one JSON field is missing.
                 value = result.get(col, MASTER_COLUMNS_FALLBACK[idx])
                 result_dict[col].append(value)
-            # API courtesy: Add a tiny 1-second "breather" between tickets to stay under the radar
-            time.sleep(1) 
+            # API courtesy: Add a "breather" between tickets to stay under the radar
+            time.sleep(WAIT_TIME) 
         except Exception as e:
             print(f"Failed to classify ticket {i} after maximum retries.")
             for idx, col in enumerate(MASTER_COLUMNS):
