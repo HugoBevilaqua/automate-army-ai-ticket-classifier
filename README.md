@@ -52,7 +52,7 @@ Launch the Streamlit web interface with a guided workflow:
 `streamlit run app.py`
 
 **Option 2 - Double-click the batch file:**
-`run_app.bat`
+`launch.bat`
 
 This opens an interactive web dashboard where you can:
 1. **Upload** a CSV file via drag-and-drop
