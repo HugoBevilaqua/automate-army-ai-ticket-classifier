@@ -31,6 +31,8 @@ CLASSIFICATION_SCHEMA = {
         },
         MASTER_COLUMNS[2]: {
             "type": "NUMBER",
+            "minimum": 0,
+            "maximum": 1,
             "description": "A score from 0.0 to 1.0 representing classification confidence."
         },
         MASTER_COLUMNS[3]: {
