@@ -61,7 +61,7 @@ This opens an interactive web dashboard where you can:
 4. **Monitor** classification progress in real-time with a progress bar
 5. **Explore** results through an interactive dashboard with filters, charts, and download options
 
-#### Terminal Interface (For Batch Processing)
+#### Terminal Interface
 To run the end-to-end workflow from the command line:
 
 `python main.py`
