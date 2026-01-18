@@ -6,7 +6,7 @@ This project provides an automated pipeline to ingest, classify, and visualize c
 
 The tool is divided into four distinct stages:
 
-1. **Intake (`csv_handler.py`):** Loads CSV files, uses LLM reasoning to identify if a header row exists, and prompts the user to confirm which column contains the ticket descriptions.
+1. **Intake (`csv_handler.py`):** Loads CSV files, uses LLM reasoning to identify if a header row exists and which column contains the ticket descriptions. Prompts the user for final confirmation.
 2. **Classification (`classifier.py`):** Forwards ticket contents to Gemini. It uses JSON schemas to enforce specific categories and priority levels defined in `config.py`.
 3. **Analysis (`analyst.py`):** Processes the output data to calculate success rates, average certainty scores, and volume distribution.
 4. **Visualization:** Two interfaces available:
