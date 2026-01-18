@@ -264,7 +264,7 @@ if st.session_state.stage == "warmup":
 elif st.session_state.stage == "upload":
     st.subheader("Step 1: Upload Your CSV File")
     
-    # File uploader (removed init_client call - already done in warmup)
+    # File uploader
     uploaded_file = st.file_uploader(
         "Drag and drop your CSV file here or click to browse",
         type=["csv"],

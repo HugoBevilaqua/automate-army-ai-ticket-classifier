@@ -7,7 +7,8 @@ from config import MASTER_CATEGORIES, MASTER_PRIORITIES, MASTER_COLUMNS, MASTER_
 st.set_page_config(page_title="AI Ticket Insights", page_icon="📊", layout="wide")
 
 # --- DATA LOADING ---
-def load_data():
+def load_data() -> tuple[pd.DataFrame, dict]:
+    """Load enriched tickets and statistics with graceful fallback if stats unavailable."""
     # Ingests pre-processed data and statistics.
     # Uses a decoupled loading strategy: if the stats file fails, 
     # the dashboard still attempts to render the raw data. 

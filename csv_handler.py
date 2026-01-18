@@ -8,7 +8,8 @@ from config import INPUT_FILE, MODEL_NAME
 
 # Uses Gemini to determine whether there are headers in the CSV file
 @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
-def check_for_headers(client, row_1, row_2):
+def check_for_headers(client: genai.Client, row_1: list, row_2: list) -> str:
+    """Use Gemini to determine if the first row contains headers or data."""
     print("Gemini is checking for headers...")
     response = client.models.generate_content(
         model=MODEL_NAME,
@@ -33,7 +34,8 @@ def check_for_headers(client, row_1, row_2):
 
 # Uses Gemini to pick the most relevant column for ticket descriptions
 @retry(stop=stop_after_attempt(3), wait=wait_fixed(10))
-def pick_header(client, headers, sample):
+def pick_header(client: genai.Client, headers: list, sample: list) -> str:
+    """Use Gemini to identify which column contains ticket descriptions."""
     print("Gemini is identifying the ticket description column...")
     response = client.models.generate_content(
         model=MODEL_NAME,
@@ -53,7 +55,8 @@ def pick_header(client, headers, sample):
     return response.text.strip()
 
 # Main intake workflow to load CSV and identify target column
-def get_ticket_column(file_path, client):
+def get_ticket_column(file_path: str, client: genai.Client) -> tuple[str, pd.DataFrame]:
+    """Load CSV and identify target column for ticket descriptions."""
     # 1. Pre-screening (Peeking)
     # We only read the first 2 rows to minimize memory usage and API token costs.
     # This 'peek' allows Gemini to compare Row 1 (potential headers) with Row 2 (actual data).

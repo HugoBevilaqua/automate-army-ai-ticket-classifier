@@ -15,6 +15,7 @@ from config import MASTER_COLUMNS, MASTER_COLUMNS_FALLBACK, MODEL_NAME, OUTPUT_F
 # This distinguishes between 'Server Overload' and 'Rate Limits', helping
 # the user understand the cause of a failed attempt.
 def log_retry(retry_state):
+    """Log retry attempts with user-friendly error messages."""
     # retry_state.outcome.exception() gives us the actual error object
     err = retry_state.outcome.exception()        
     # We simplify the message for the terminal
@@ -35,7 +36,8 @@ def log_retry(retry_state):
     after=log_retry, # This tells Tenacity to run our log function
     reraise=True
 )
-def classify_ticket(client, description):
+def classify_ticket(client: genai.Client, description: str) -> dict:
+    """Classify a support ticket using Gemini with exponential backoff retry logic."""
     response = client.models.generate_content(
         model=MODEL_NAME,
         contents=f"Classify this support ticket: '{description}'",
@@ -47,8 +49,8 @@ def classify_ticket(client, description):
     return json.loads(response.text)
 
 # Main classification workflow to enrich the DataFrame with AI-generated labels
-def run_classification(df, client, target_col, progress_callback=None):
-
+def run_classification(df: pd.DataFrame, client: genai.Client, target_col: str, progress_callback: callable | None = None) -> None:
+    """Classify all tickets in a DataFrame and save enriched results to CSV."""
     # 3. Iterative processing
     total_tickets = len(df)
     # This creates: {"col1": [], "col2": [], ...} dynamically

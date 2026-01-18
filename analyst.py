@@ -3,7 +3,8 @@ import pandas as pd
 from config import CONFIDENCE_THRESHOLD, MASTER_CATEGORIES, MASTER_PRIORITIES, MASTER_COLUMNS, MASTER_COLUMNS_FALLBACK, STATS_FILE, OUTPUT_FILE
 
 # Reads the enriched CSV and generates an aggregation summary.
-def compute_stats(file_path):    
+def compute_stats(file_path: str) -> None: 
+    """Compute aggregated statistics from enriched tickets and save to CSV."""   
     print("\nAnalyzing results to generate stats...")
     # Data loading
     df = pd.read_csv(file_path)
