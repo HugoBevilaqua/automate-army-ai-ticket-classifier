@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from tenacity import retry, stop_after_attempt, wait_fixed
 from config import TICKET_CREATOR_COLUMNS, MODEL_NAME, TEST_FILE, OUTPUT_DIR
 
-# 2. Structured output schema (JSON enforcement)
+# Structured output schema (JSON enforcement)
 # We define an array-based JSON schema to ensure the AI returns a structured 
 # list of objects that perfectly match our project's desired CSV headers.
 ai_columns = TICKET_CREATOR_COLUMNS[1:] 
@@ -26,7 +26,7 @@ batch_schema = {
     "required": ["tickets"]
 }
 
-# 3. Prompting
+# Prompting
 # We provide the AI with context to ensure the 
 # generated tickets are realistic and diverse.
 @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))   
@@ -48,7 +48,7 @@ def request_batch(client, count):
 # Utility script to generate synthetic support tickets for testing and demo purposes.
 def generate_test_data(client):
     print("--- Dynamic Ticket Generator ---")
-    # 1. User guardrail
+    # User guardrail
     # Prevent accidental high-cost API usage by requiring confirmation for large batches.
     while True:
         count = int(input("How many tickets would you like to generate? ") or 10)
@@ -76,7 +76,7 @@ def generate_test_data(client):
 
     print(f"Requesting a batch of {count} unique tickets...")
     
-    # 4. Tagging
+    # Tagging
     # After receiving the AI text, we programmatically add a 'ticket_id'.
     response = request_batch(client, count)
     raw_data = json.loads(response.text)
@@ -84,7 +84,7 @@ def generate_test_data(client):
     for i, ticket in enumerate(ticket_list):
         ticket["ticket_id"] = f"TKT-{1000 + i}"
 
-    # 5. Export
+    # Export
     # We use QUOTE_ALL to ensure that even if a generated ticket contains 
     # commas or special characters, the CSV structure remains intact.
     os.makedirs(os.path.dirname(full_path), exist_ok=True)
