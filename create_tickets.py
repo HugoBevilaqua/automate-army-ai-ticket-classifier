@@ -57,6 +57,10 @@ def generate_test_data(client):
             print("Invalid input. Please enter a valid number.")
             continue
         
+        if count <= 0:
+            print("Please enter a positive number of tickets.")
+            continue
+
         if count > 100:
             print(f"\nWARNING: You are requesting {count} tickets.")
             print("Large requests may take significant time and API tokens.")
