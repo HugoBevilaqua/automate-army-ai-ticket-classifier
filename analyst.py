@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 from config import CONFIDENCE_THRESHOLD, MASTER_CATEGORIES, MASTER_PRIORITIES, MASTER_COLUMNS, MASTER_COLUMNS_FALLBACK, STATS_FILE, OUTPUT_FILE
 
@@ -58,6 +59,7 @@ def compute_stats(file_path):
 
     # Create dataframe and save .csv file
     stats_df = pd.DataFrame(report, columns=["metric", "value"])
+    os.makedirs(os.path.dirname(STATS_FILE), exist_ok=True)
     stats_df.to_csv(STATS_FILE, index=False)
 
     print(f"--- DONE! Check '{STATS_FILE}' ---")

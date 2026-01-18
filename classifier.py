@@ -95,6 +95,7 @@ def run_classification(df, client, target_col, progress_callback=None):
     for col in MASTER_COLUMNS:
         df[col] = result_dict[col]
 
+    os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
     df.to_csv(OUTPUT_FILE, index=False, quoting=csv.QUOTE_NONNUMERIC)
     
     if progress_callback:
