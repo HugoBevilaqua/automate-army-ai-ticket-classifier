@@ -1,6 +1,6 @@
 # AI Support Ticket Classifier & Analytics Dashboard
 
-This project provides an automated pipeline to ingest, classify, and visualize customer support tickets using the Google Gemini API.
+This project provides an automated pipeline to ingest, classify, and visualize customer support tickets using the Google Gemini API. The tool classifies each ticket by **category** and **priority**, and provides a **certainty score** and **reasoning** for each classification.
 
 ## Architecture
 
