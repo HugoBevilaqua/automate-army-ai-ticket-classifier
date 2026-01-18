@@ -51,7 +51,12 @@ def generate_test_data(client):
     # User guardrail
     # Prevent accidental high-cost API usage by requiring confirmation for large batches.
     while True:
-        count = int(input("How many tickets would you like to generate? ") or 10)
+        try:
+            count = int(input("How many tickets would you like to generate? ") or 10)
+        except ValueError:
+            print("Invalid input. Please enter a valid number.")
+            continue
+        
         if count > 100:
             print(f"\nWARNING: You are requesting {count} tickets.")
             print("Large requests may take significant time and API tokens.")
