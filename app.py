@@ -15,7 +15,9 @@ from config import MODEL_NAME, OUTPUT_FILE, MASTER_CATEGORIES, MASTER_PRIORITIES
 # Page configuration
 st.set_page_config(page_title="Ticket Classifier UI", page_icon="🎫", layout="wide")
 
-# Initialize session state
+# Initialize session state.
+# Session state variables are special streamlit containers that persist across user interactions,
+# allowing us to maintain context in this multi-step application. 
 if "stage" not in st.session_state:
     st.session_state.stage = "warmup"
 if "client" not in st.session_state:
@@ -35,7 +37,7 @@ if "gemini_suggestion" not in st.session_state:
 if "col_confirm_area" not in st.session_state:
     st.session_state.col_confirm_area = None
 
-# --- DYNAMIC TITLE AND SUBTITLE ---
+# --- Dynamic Title and Subtitle ---
 def display_title_and_subtitle():
     """Display dynamic title and subtitle based on stage."""
     if st.session_state.stage == "complete":
@@ -45,10 +47,10 @@ def display_title_and_subtitle():
         st.title("🎫 Support Ticket Classifier")
         st.markdown("Upload your CSV file and let AI classify your support tickets.")
 
-# --- INITIALIZATION ---
+# --- Initialization ---
 def init_client():
     """Initialize the Gemini client and test connection."""
-    if st.session_state.client is not None:
+    if st.session_state.client is not None: # Already initialized? Don't redo.
         return True
     
     load_dotenv(override=True)
@@ -75,7 +77,7 @@ def init_client():
         st.error(f"❌ Connection failed: {e}")
         return False
 
-# --- DASHBOARD HELPER FUNCTIONS ---
+# --- Dashboard Helper Functions ---
 def load_enriched_data():
     """Load the enriched tickets and statistics."""
     try:
@@ -91,6 +93,7 @@ def load_enriched_data():
         st.error(f"Error: '{OUTPUT_FILE}' not found.")
         return pd.DataFrame(), {}
 
+# Display the full dashboard
 def display_dashboard():
     """Display the full dashboard with metrics, charts, and data."""
     df, stats = load_enriched_data()
@@ -101,7 +104,7 @@ def display_dashboard():
     
 
     
-    # --- SIDEBAR FILTERS ---
+    # --- Sidebar Filters ---
     st.sidebar.header("Filter Options")
     selected_cats = st.sidebar.multiselect(
         "Select Categories",
@@ -120,7 +123,7 @@ def display_dashboard():
         (df[MASTER_COLUMNS[1]].isin(selected_prio))
     ]
     
-    # --- EXPORT ACTIONS ---
+    # --- Export Actions ---
     col1, col2, colspacer = st.columns([2, 2, 10])
     with col1:
         try:
@@ -151,7 +154,7 @@ def display_dashboard():
     
     st.divider()
     
-    # --- TOP-LEVEL METRICS ---
+    # --- Top-Level Metrics ---
     col1, col2, col3, col4, col5 = st.columns(5)
     with col1:
         st.metric("Total Processed", int(stats.get('total_processed', len(df))))
@@ -166,7 +169,7 @@ def display_dashboard():
         avg_cert = stats.get('avg_ai_certainty', 0)
         st.metric("Avg AI Certainty", f"{float(avg_cert):.1%}")
     
-    # --- DATA VISUALIZATION ---
+    # --- Data Visualization (Pie Charts) ---
     st.subheader("Data Proportions")
     chart_col1, chart_col2 = st.columns(2)
     
@@ -201,20 +204,20 @@ def display_dashboard():
         else:
             st.info("No priorities to display.")
     
-    # --- DATA TABLES ---
+    # --- Data Tables ---
     st.subheader("Detailed Ticket Log")
     if filtered_df.empty:
         st.info("No tickets match the current filters.")
     else:
         st.dataframe(filtered_df, width='stretch', hide_index=True)
     
-    # --- SAFETY NET ---
+    # --- Safety Net ---
     urgent_df = df[(df[MASTER_COLUMNS[1]] == MASTER_COLUMNS_FALLBACK[1]) | (df[MASTER_COLUMNS[2]] < CONFIDENCE_THRESHOLD)]
     if not urgent_df.empty:
         st.error(f"🚨 Action Required - {len(urgent_df)} tickets failed automated classification or fell below the {CONFIDENCE_THRESHOLD:.0%} certainty threshold.")
         st.dataframe(urgent_df, width='stretch', hide_index=True)
 
-# --- WRAPPER FOR CLASSIFICATION WITH PROGRESS ---
+# --- Wrapper for Classification with Progress ---
 def run_classification_with_progress(df, client, target_col):
     """Wrapper that provides Streamlit progress updates for run_classification."""
     total_tickets = len(df)
@@ -231,11 +234,11 @@ def run_classification_with_progress(df, client, target_col):
             progress_text.text(f"[{current}/{total}]")
     
     # Call the original classifier with our progress callback
-    run_classification(df, client, target_col, progress_callback=update_progress)
+    run_classification(df, client, target_col, progress_callback=update_progress) # We call run_classification with an added argument to update progress.
     
     st.success(f"Successfully processed {total_tickets} tickets!")
 
-# --- MAIN UI ---
+# --- Main UI ---
 display_title_and_subtitle()
 
 # Persistent container for Step 3 UI
@@ -327,7 +330,7 @@ elif st.session_state.stage == "header_confirm":
     st.divider()
     col1, col2, col3 = st.columns(3)
     
-    if st.session_state.gemini_suggestion == "HEADERS":
+    if st.session_state.gemini_suggestion == "HEADERS": # Headers detected
         with col1:
             if st.button("✅ Correct, has headers", type="primary", width='stretch'):
                 st.session_state.headers_detected = "HEADERS"
@@ -342,7 +345,7 @@ elif st.session_state.stage == "header_confirm":
                 st.session_state.uploaded_df.columns = [f"column_{i}" for i in range(len(st.session_state.uploaded_df.columns))]
                 st.session_state.stage = "col_confirm"
                 st.rerun()
-    else:  # DATA
+    else:  # Data detected
         with col1:
             if st.button("✅ Correct, no headers", type="primary", width='stretch'):
                 st.session_state.headers_detected = "DATA"

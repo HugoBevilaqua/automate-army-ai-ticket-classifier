@@ -78,7 +78,7 @@ def run_classification(df, client, target_col, progress_callback=None):
                 val = MASTER_COLUMNS_FALLBACK[idx] if idx < 3 else f"Error: {str(e)[:40]}"
                 result_dict[col].append(val)
 
-    # 4. DATA INTEGRITY (Legacy Protection)
+    # 4. Data Integrity (Legacy Protection)
     # If the output file already contains our target columns, we back up the 
     # original data by renaming it (e.g., 'Category' becomes 'Category_original').
     # This prevents destructive overwrites of existing human or AI work.
