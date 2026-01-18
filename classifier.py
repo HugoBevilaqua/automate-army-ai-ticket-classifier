@@ -56,6 +56,7 @@ def run_classification(df, client, target_col, progress_callback=None):
 
     print(f"\nClassifying {total_tickets} tickets with Gemini...")
 
+    # Iterate through each row in the enumerated DataFrame
     for i, (_, row) in enumerate(df.iterrows(), start=1):
         try:
             # Get our classifications for each row
